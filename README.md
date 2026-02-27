@@ -1,79 +1,85 @@
-# 🔍 PageFinder — 智能网页链接提取器
+<p align="center">
+  <strong>🌐 <a href="README.md">English</a> | <a href="README_CN.md">中文</a></strong>
+</p>
 
-> 专为 [NotebookLM](https://notebooklm.google.com/) 工作流设计，自动提取网页中所有链接，再也不用一个一个手动复制！
+# 🔍 PageFinder — Intelligent Web Link Extractor
 
-![PageFinder Screenshot](https://img.shields.io/badge/Node.js-v18+-green?logo=node.js) ![License](https://img.shields.io/badge/license-MIT-blue) ![Puppeteer](https://img.shields.io/badge/Powered_by-Puppeteer-40B5A4?logo=puppeteer)
+> Designed for [NotebookLM](https://notebooklm.google.com/) workflows. Automatically extract all links from any web page — no more manual copy-paste!
 
-## ✨ 功能特性
+![Node.js](https://img.shields.io/badge/Node.js-v18+-green?logo=node.js) ![License](https://img.shields.io/badge/license-MIT-blue) ![Puppeteer](https://img.shields.io/badge/Powered_by-Puppeteer-40B5A4?logo=puppeteer)
 
-- 🤖 **Puppeteer 驱动** — 使用真实 Chrome 浏览器渲染，完美支持 React / Next.js / Vue 等现代 SPA 应用
-- 📑 **分页内容提取** — 自动点击标签页，提取切换后才显示的隐藏内容
-- 🏷️ **智能分类** — 自动将链接分为 YouTube、Google文档/Drive、GitHub、PDF、站内、外部
-- 🌊 **深度爬取** — 支持深度 1 / 2 / 3 递归爬取子页面
-- 🔍 **实时搜索过滤** — 按标题或 URL 快速筛选
-- 📋 **一键复制** — 复制单条链接、标题+链接，或一键复制全部
-- 📥 **导出 Markdown** — 直接生成结构化文档，可粘贴进 NotebookLM
+## ✨ Features
 
-## 🚀 快速开始
+- 🤖 **Puppeteer-powered** — Uses a real Chrome browser to render pages, fully supports React / Next.js / Vue SPAs
+- 📑 **Tab content extraction** — Automatically clicks tabs to reveal hidden content
+- 🏷️ **Smart categorization** — Auto-classifies links as YouTube, Google Docs/Drive, GitHub, PDF, Social, Homepage, Internal, or External
+- 🌊 **Deep crawl** — Supports depth 1 / 2 / 3 recursive sub-page crawling
+- 🔍 **Real-time search & filter** — Quickly filter by title or URL
+- 📋 **One-click copy** — Copy a single link, title + link, or all links at once
+- 📥 **Markdown export** — Generate structured documents ready for NotebookLM
+- 🌐 **Bilingual UI** — Supports both English and Chinese interfaces
 
-### 前置要求
+## 🚀 Quick Start
 
-- [Node.js](https://nodejs.org/) v18 或更高版本
+### Prerequisites
 
-### 安装
+- [Node.js](https://nodejs.org/) v18 or higher
+
+### Installation
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/PageFinder.git
+git clone https://github.com/bevantu/PageFinder.git
 cd PageFinder
 npm install
 ```
 
-> ⚠️ 首次 `npm install` 会自动下载 Puppeteer 内置的 Chromium，约 300MB，请耐心等待。
+> ⚠️ The first `npm install` will download Puppeteer's bundled Chromium (~300MB). Please be patient.
 
-### 启动
+### Run
 
 ```bash
 node server.js
 ```
 
-然后在浏览器访问 **http://localhost:3737**
+Then open **http://localhost:3737** in your browser.
 
-> 💡 第一次请求会启动内置 Chrome（约 3-5 秒），之后速度更快。
+> 💡 The first request launches the built-in Chrome (~3-5 seconds). Subsequent requests are faster.
 
-## 📖 使用说明
+## 📖 Usage
 
-1. **输入网页地址** — 粘贴你想要提取链接的页面 URL
-2. **选择爬取深度**：
-   - **仅首页** — 只分析当前页面（速度最快）
-   - **深度 2/3** — 递归进入子页面继续提取（适合目录/课程索引页）
-3. **范围限制** — 开启"仅同域名链接"可过滤掉不相关的外站链接
-4. **快速预览** — 单页快速模式，适合先看看效果
-5. **深度爬取** — 完整多层爬取模式
+1. **Enter a URL** — Paste the page URL you want to extract links from
+2. **Choose crawl depth**:
+   - **Page only** — Analyze only the current page (fastest)
+   - **Depth 2/3** — Recursively enter sub-pages (great for course index or syllabus pages)
+3. **Content type filter** — Pre-select which link types you want (multi-select, applied before crawl)
+4. **Quick preview** — Single-page fast mode
+5. **Deep crawl** — Full multi-level crawl mode
 
-### 导出到 NotebookLM
+### Export to NotebookLM
 
-点击 **导出** 按钮，生成 `.md` 文件，直接上传到 NotebookLM 作为知识源；或点击 **复制全部** 直接粘贴链接列表。
+Click **Export** to generate a `.md` file for direct upload to NotebookLM, or click **Copy All** to copy all URLs to your clipboard.
 
-## 🛠️ 技术栈
+## 🛠️ Tech Stack
 
-| 层级 | 技术 |
-|------|------|
-| 后端 | Node.js + Express |
-| 爬虫 | Puppeteer (Chromium) + Axios + Cheerio |
-| 前端 | HTML / Vanilla CSS / Vanilla JS |
-| 设计 | Dark UI + Glassmorphism |
+| Layer | Technology |
+|-------|-----------|
+| Backend | Node.js + Express |
+| Crawler | Puppeteer (Chromium) + Axios + Cheerio |
+| Frontend | HTML / Vanilla CSS / Vanilla JS |
+| Design | Dark UI + Glassmorphism |
 
-## 📁 项目结构
+## 📁 Project Structure
 
 ```
 PageFinder/
-├── server.js          # 后端：爬虫 + API 服务
+├── server.js          # Backend: crawler + API
 ├── package.json
 ├── public/
-│   ├── index.html     # 前端页面
-│   ├── style.css      # 样式
-│   └── app.js         # 前端逻辑
-└── .gitignore
+│   ├── index.html     # Frontend page
+│   ├── style.css      # Styles
+│   └── app.js         # Frontend logic
+├── README.md          # English README
+└── README_CN.md       # Chinese README
 ```
 
 ## 📄 License

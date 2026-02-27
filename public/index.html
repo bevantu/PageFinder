@@ -47,19 +47,29 @@
         </div>
         <div class="logo-text">
           <span class="logo-title">PageFinder</span>
-          <span class="logo-sub">智能网页链接提取器</span>
+          <span class="logo-sub" data-i18n="logoSub">智能网页链接提取器</span>
         </div>
       </div>
-      <div class="header-badge">
-        <span class="badge-dot"></span>
-        专为 NotebookLM 设计
+      <div class="header-right">
+        <button class="lang-btn" id="langBtn" title="Switch Language">
+          <svg viewBox="0 0 20 20" fill="none" style="width:16px;height:16px">
+            <path
+              d="M10 2a8 8 0 100 16 8 8 0 000-16zM2.93 9H6.1a13.7 13.7 0 01.82-4.42A6.02 6.02 0 002.93 9zm0 2a6.02 6.02 0 003.99 4.42A13.7 13.7 0 016.1 11H2.93zM10 16.93c-.86-.4-1.9-1.88-2.36-4.43h4.72c-.46 2.55-1.5 4.03-2.36 4.43zM12.64 9H7.36c.38-2.55 1.38-4.18 2.27-4.82.1-.08.23-.11.37-.11s.27.03.37.11c.89.64 1.89 2.27 2.27 4.82zm.44 2a13.7 13.7 0 01-.82 4.42A6.02 6.02 0 0017.07 11h-3.17zm0-2h3.17a6.02 6.02 0 00-3.99-4.42c.44 1.15.74 2.68.82 4.42z"
+              fill="currentColor" />
+          </svg>
+          <span id="langLabel">EN</span>
+        </button>
+        <div class="header-badge">
+          <span class="badge-dot"></span>
+          <span data-i18n="badge">专为 NotebookLM 设计</span>
+        </div>
       </div>
     </header>
 
     <!-- Main input section -->
     <section class="search-section">
       <div class="search-card">
-        <div class="search-label">输入网页地址</div>
+        <div class="search-label" data-i18n="searchLabel">输入网页地址</div>
         <div class="search-row">
           <div class="url-input-wrap">
             <svg class="input-icon" viewBox="0 0 20 20" fill="none">
@@ -67,9 +77,9 @@
                 d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z"
                 fill="currentColor" />
             </svg>
-            <input type="url" id="urlInput" placeholder="https://example.com/course" autocomplete="off"
-              spellcheck="false" />
-            <button class="clear-btn" id="clearBtn" title="清除" style="display:none">
+            <input type="url" id="urlInput" data-i18n-placeholder="urlPlaceholder"
+              placeholder="https://example.com/course" autocomplete="off" spellcheck="false" />
+            <button class="clear-btn" id="clearBtn" data-i18n-title="clear" title="清除" style="display:none">
               <svg viewBox="0 0 20 20" fill="none">
                 <path d="M6 6l8 8M14 6l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
               </svg>
@@ -80,35 +90,36 @@
         <!-- Options -->
         <div class="options-row">
           <div class="option-group">
-            <label class="option-label">爬取深度</label>
+            <label class="option-label" data-i18n="depthLabel">爬取深度</label>
             <div class="depth-selector">
-              <button class="depth-btn active" data-depth="1" id="depth1">仅首页</button>
-              <button class="depth-btn" data-depth="2" id="depth2">深度 2</button>
-              <button class="depth-btn" data-depth="3" id="depth3">深度 3</button>
+              <button class="depth-btn active" data-depth="1" id="depth1" data-i18n="depth1">仅首页</button>
+              <button class="depth-btn" data-depth="2" id="depth2" data-i18n="depth2">深度 2</button>
+              <button class="depth-btn" data-depth="3" id="depth3" data-i18n="depth3">深度 3</button>
             </div>
           </div>
           <div class="option-group">
-            <label class="option-label">深度爬取范围</label>
+            <label class="option-label" data-i18n="scopeLabel">深度爬取范围</label>
             <label class="toggle-wrap">
               <input type="checkbox" id="sameDomainToggle" checked />
               <span class="toggle"></span>
-              <span class="toggle-text">递进时只跟踪同域名链接</span>
+              <span class="toggle-text" data-i18n="toggleText">递进时只跟踪同域名链接</span>
             </label>
-            <div class="toggle-hint" id="toggleHint">仅对深度 2 / 3 生效</div>
+            <div class="toggle-hint" id="toggleHint" data-i18n="toggleHint">仅对深度 2 / 3 生效</div>
           </div>
           <div class="option-group">
-            <label class="option-label">爬取内容类型 <span
-                style="font-weight:400;letter-spacing:0;text-transform:none;color:var(--accent2);">· 可多选</span></label>
+            <label class="option-label"><span data-i18n="typeLabel">爬取内容类型</span> <span
+                style="font-weight:400;letter-spacing:0;text-transform:none;color:var(--accent2);"
+                data-i18n="multiSelect">· 可多选</span></label>
             <div class="filter-chips" id="filterChips">
-              <button class="chip active" data-cat="all">全部</button>
-              <button class="chip" data-cat="Internal">站内页面</button>
-              <button class="chip" data-cat="External">外部链接</button>
+              <button class="chip active" data-cat="all" data-i18n="catAll">全部</button>
+              <button class="chip" data-cat="Internal" data-i18n="catInternal">站内页面</button>
+              <button class="chip" data-cat="External" data-i18n="catExternal">外部链接</button>
               <button class="chip" data-cat="YouTube">YouTube</button>
-              <button class="chip" data-cat="Google Drive/Docs">Google文档</button>
+              <button class="chip" data-cat="Google Drive/Docs" data-i18n="catGoogle">Google文档</button>
               <button class="chip" data-cat="GitHub">GitHub</button>
               <button class="chip" data-cat="PDF">PDF</button>
-              <button class="chip" data-cat="Social">社交主页</button>
-              <button class="chip" data-cat="Homepage">品牌首页</button>
+              <button class="chip" data-cat="Social" data-i18n="catSocial">社交主页</button>
+              <button class="chip" data-cat="Homepage" data-i18n="catHomepage">品牌首页</button>
             </div>
           </div>
         </div>
@@ -121,7 +132,7 @@
                 d="M10 2a8 8 0 100 16A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4zm0 3a1 1 0 00-1 1v2H7a1 1 0 000 2h2v2a1 1 0 002 0v-2h2a1 1 0 000-2h-2V8a1 1 0 00-1-1z"
                 fill="currentColor" />
             </svg>
-            深度爬取
+            <span data-i18n="crawlBtn">深度爬取</span>
           </button>
           <button class="btn-secondary" id="previewBtn">
             <svg viewBox="0 0 20 20" fill="none">
@@ -129,7 +140,7 @@
               <path d="M2 10C3.6 6.1 6.5 4 10 4s6.4 2.1 8 6c-1.6 3.9-4.5 6-8 6s-6.4-2.1-8-6z" stroke="currentColor"
                 stroke-width="1.5" fill="none" />
             </svg>
-            快速预览
+            <span data-i18n="previewBtn">快速预览</span>
           </button>
         </div>
       </div>
@@ -161,9 +172,9 @@
             <path d="M12 7v5M12 16v1" stroke="#f87171" stroke-width="2" stroke-linecap="round" />
           </svg>
         </div>
-        <div class="error-title">爬取失败</div>
+        <div class="error-title" data-i18n="errorTitle">爬取失败</div>
         <div class="error-msg" id="errorMsg">无法连接到目标网页</div>
-        <button class="btn-secondary btn-sm" id="retryBtn">重试</button>
+        <button class="btn-secondary btn-sm" id="retryBtn" data-i18n="retryBtn">重试</button>
       </div>
     </div>
 
@@ -174,12 +185,12 @@
         <div class="stats-info">
           <div class="stat-item">
             <span class="stat-num" id="statTotal">0</span>
-            <span class="stat-label">条链接</span>
+            <span class="stat-label" data-i18n="statLinks">条链接</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-item">
             <span class="stat-num" id="statPages">0</span>
-            <span class="stat-label">个页面</span>
+            <span class="stat-label" data-i18n="statPages">个页面</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-item stat-title-info">
@@ -195,7 +206,7 @@
                 d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
                 fill="currentColor" clip-rule="evenodd" />
             </svg>
-            <input type="text" id="searchInput" placeholder="搜索链接标题或URL…" />
+            <input type="text" id="searchInput" data-i18n-placeholder="searchPlaceholder" placeholder="搜索链接标题或URL…" />
           </div>
           <button class="btn-copy-all" id="copyAllBtn">
             <svg viewBox="0 0 20 20" fill="none">
@@ -203,7 +214,7 @@
               <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"
                 fill="currentColor" />
             </svg>
-            复制全部
+            <span data-i18n="copyAll">复制全部</span>
           </button>
           <button class="btn-export" id="exportBtn">
             <svg viewBox="0 0 20 20" fill="none">
@@ -211,7 +222,7 @@
                 d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
                 fill="currentColor" clip-rule="evenodd" />
             </svg>
-            导出
+            <span data-i18n="exportBtn">导出</span>
           </button>
         </div>
       </div>
@@ -228,7 +239,7 @@
           <circle cx="32" cy="32" r="28" stroke="#4f46e5" stroke-width="2" opacity="0.3" />
           <path d="M22 32h20M32 22v20" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" opacity="0.5" />
         </svg>
-        <p>没有找到匹配的链接</p>
+        <p data-i18n="emptyFilter">没有找到匹配的链接</p>
       </div>
     </section>
 
