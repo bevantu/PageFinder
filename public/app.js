@@ -6,12 +6,14 @@ const $ = id => document.getElementById(id);
 const API = '';
 
 // ── State ────────────────────────────────────────
-let allLinks = [];
-let filteredLinks = [];
+let allLinks = [];       // raw results from API
+let baseLinks = [];       // allLinks after pre-crawl type filter
+let filteredLinks = [];   // baseLinks after category tab + search
 let activeCategory = 'all';
 let searchQuery = '';
 let currentDepth = 1;
 let sameDomainOnly = true;
+let preFilterCats = new Set(['all']); // pre-crawl type selection
 
 // ── Category icons & colors ──────────────────────
 const CAT_ICONS = {
@@ -95,23 +97,37 @@ $('sameDomainToggle').addEventListener('change', e => {
     sameDomainOnly = e.target.checked;
 });
 
-// ── Filter chips (search card) ───────────────────
+// ── Filter chips — 爬取前多选预设 ────────────────
+// 默认「全部」选中；选具体类型时「全部」自动取消；
+// 所有具体类型都取消时自动回到「全部」。
 document.querySelectorAll('#filterChips .chip').forEach(chip => {
     chip.addEventListener('click', () => {
-        if (!allLinks.length) {
-            showToast('请先爬取一个网页', 'error');
-            return;
-        }
         const cat = chip.dataset.cat;
-        // Sync active state on chips
-        document.querySelectorAll('#filterChips .chip').forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        // Sync with results tab bar
-        setCatTab(cat);
-        // Scroll to results
-        resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (cat === 'all') {
+            preFilterCats = new Set(['all']);
+        } else {
+            preFilterCats.delete('all');
+            if (preFilterCats.has(cat)) {
+                preFilterCats.delete(cat);
+                if (preFilterCats.size === 0) preFilterCats.add('all'); // 全部取消 → 回到「全部」
+            } else {
+                preFilterCats.add(cat);
+            }
+        }
+        updateChipStates();
     });
 });
+
+function updateChipStates() {
+    document.querySelectorAll('#filterChips .chip').forEach(chip => {
+        chip.classList.toggle('active', preFilterCats.has(chip.dataset.cat));
+    });
+}
+
+function applyPreFilter(links) {
+    if (preFilterCats.has('all')) return links;
+    return links.filter(l => preFilterCats.has(l.category));
+}
 
 // ── Crawl triggers ───────────────────────────────
 crawlBtn.addEventListener('click', () => doCrawl(false));
@@ -181,19 +197,19 @@ async function doCrawl(preview = false) {
         const data = await resp.json();
         allLinks = data.links || [];
 
-        // Build category tabs
-        const cats = ['全部', ...new Set(allLinks.map(l => l.category))];
-        renderCatTabs(cats, allLinks);
+        // Apply pre-crawl type filter → baseLinks
+        baseLinks = applyPreFilter(allLinks);
+
+        // Build category tabs from baseLinks
+        renderCatTabs(baseLinks);
 
         activeCategory = 'all';
         searchQuery = '';
         searchInput.value = '';
 
-        // Sync filter chips with actual found categories
-        syncFilterChips(allLinks);
-
         applyFilters();
-        showResults(data);
+        // Show adjusted total (pre-filtered)
+        showResults(data, baseLinks.length);
     } catch (err) {
         showError(err.message || '爬取失败，请检查网址或网络连接');
     }
@@ -201,7 +217,8 @@ async function doCrawl(preview = false) {
 
 // ── Filters ──────────────────────────────────────
 function applyFilters() {
-    filteredLinks = allLinks.filter(l => {
+    // Filter within baseLinks (already pre-filtered by type chips)
+    filteredLinks = baseLinks.filter(l => {
         const matchCat = activeCategory === 'all' || l.category === activeCategory;
         const matchSearch = !searchQuery ||
             l.title.toLowerCase().includes(searchQuery) ||
@@ -209,11 +226,11 @@ function applyFilters() {
         return matchCat && matchSearch;
     });
     renderLinks(filteredLinks);
-    emptyFilter.style.display = (filteredLinks.length === 0 && allLinks.length > 0) ? 'flex' : 'none';
+    emptyFilter.style.display = (filteredLinks.length === 0 && baseLinks.length > 0) ? 'flex' : 'none';
 }
 
 // ── Render: Category tabs ─────────────────────────
-function renderCatTabs(cats, links) {
+function renderCatTabs(links) {
     catTabs.innerHTML = '';
     const counts = {};
     for (const l of links) counts[l.category] = (counts[l.category] || 0) + 1;
@@ -238,35 +255,10 @@ function renderCatTabs(cats, links) {
 
 function setCatTab(cat) {
     activeCategory = cat;
-    // Sync results tab bar
     document.querySelectorAll('.cat-tab').forEach(t => {
         t.classList.toggle('active', t.dataset.cat === cat);
     });
-    // Sync search-card filter chips
-    document.querySelectorAll('#filterChips .chip').forEach(c => {
-        c.classList.toggle('active', c.dataset.cat === cat);
-    });
     applyFilters();
-}
-
-// ── Sync filter chips after crawl ─────────────────
-function syncFilterChips(links) {
-    const foundCats = new Set(links.map(l => l.category));
-    document.querySelectorAll('#filterChips .chip').forEach(chip => {
-        const cat = chip.dataset.cat;
-        if (cat === 'all') {
-            chip.classList.remove('disabled');
-            chip.classList.add('active');
-            chip.title = '';
-        } else if (foundCats.has(cat)) {
-            chip.classList.remove('disabled', 'active');
-            chip.title = '';
-        } else {
-            chip.classList.remove('active');
-            chip.classList.add('disabled');
-            chip.title = '当前结果中没有此类链接';
-        }
-    });
 }
 
 // ── Render: Link items ────────────────────────────
@@ -347,11 +339,24 @@ function showError(msg) {
     errorSection.style.display = 'block';
 }
 
-function showResults(data) {
+function showResults(data, filteredTotal) {
     hideAll();
-    statTotal.textContent = data.totalLinks || 0;
+    // Show pre-filtered count if a type filter is active
+    const total = (filteredTotal !== undefined) ? filteredTotal : (data.totalLinks || 0);
+    statTotal.textContent = total;
     statPages.textContent = data.pagesVisited || 1;
     pageTitle.textContent = data.pageTitle || '—';
+    // Show a note if pre-filter reduced the count
+    const rawTotal = data.totalLinks || 0;
+    const filterNote = $('filterNote');
+    if (filterNote) {
+        if (!preFilterCats.has('all') && rawTotal > total) {
+            filterNote.textContent = `（共爬取 ${rawTotal} 条，已按类型过滤）`;
+            filterNote.style.display = 'inline';
+        } else {
+            filterNote.style.display = 'none';
+        }
+    }
     resultsSection.style.display = 'block';
 }
 
