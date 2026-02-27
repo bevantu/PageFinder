@@ -24,6 +24,8 @@ const CAT_ICONS = {
     GitHub: '🐙',
     PDF: '📕',
     Dynamic: '⚡',
+    Social: '👤',
+    Homepage: '🏠',
     Link: '🔗',
     default: '🔗',
 };
@@ -35,6 +37,8 @@ const CAT_CLASS = {
     GitHub: 'cat-GitHub',
     PDF: 'cat-PDF',
     Dynamic: 'cat-Dynamic',
+    Social: 'cat-Social',
+    Homepage: 'cat-Homepage',
     default: 'cat-Internal',
 };
 const BADGE_CLASS = {
@@ -45,6 +49,8 @@ const BADGE_CLASS = {
     GitHub: 'badge-GitHub',
     PDF: 'badge-PDF',
     Dynamic: 'badge-Dynamic',
+    Social: 'badge-Social',
+    Homepage: 'badge-Homepage',
     default: 'badge-Internal',
 };
 

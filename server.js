@@ -75,13 +75,46 @@ function cleanText(text) {
     return String(text || '').replace(/\s+/g, ' ').trim();
 }
 
+// Social platforms — profile/community links, rarely contain actual content
+const SOCIAL_DOMAINS = new Set([
+    'linkedin.com', 'twitter.com', 'x.com', 'facebook.com', 'instagram.com',
+    'threads.net', 'tiktok.com', 'weibo.com', 'pinterest.com', 'reddit.com',
+    'discord.com', 'discord.gg', 'telegram.org', 't.me', 'snapchat.com',
+    'mastodon.social', 'bsky.app', 'tumblr.com',
+]);
+
 function categorize(url, baseUrl) {
     const lower = url.toLowerCase();
-    if (lower.includes('youtube.com/') || lower.includes('youtu.be/')) return 'YouTube';
-    if (lower.includes('drive.google.com') || lower.includes('docs.google.com') || lower.includes('sheets.google.com') || lower.includes('slides.google.com')) return 'Google Drive/Docs';
-    if (lower.includes('github.com')) return 'GitHub';
-    if (lower.endsWith('.pdf') || lower.includes('.pdf?')) return 'PDF';
+    let hostname = '', pathname = '';
+    try {
+        const parsed = new URL(url);
+        hostname = parsed.hostname.replace(/^www\./, '');
+        pathname = parsed.pathname;
+    } catch { return 'External'; }
+
+    // YouTube
+    if (hostname.includes('youtube.com') || hostname === 'youtu.be') return 'YouTube';
+
+    // Google Drive / Docs
+    if (['drive.google.com', 'docs.google.com', 'sheets.google.com',
+        'slides.google.com', 'forms.google.com'].some(d => hostname === d)) return 'Google Drive/Docs';
+
+    // GitHub
+    if (hostname === 'github.com' || hostname.endsWith('.github.com') || hostname.endsWith('.github.io')) return 'GitHub';
+
+    // PDF
+    if (pathname.toLowerCase().endsWith('.pdf') || lower.includes('.pdf?')) return 'PDF';
+
+    // Social / Profile (noise: personal profiles, community portals)
+    if (SOCIAL_DOMAINS.has(hostname) || [...SOCIAL_DOMAINS].some(d => hostname.endsWith('.' + d))) return 'Social';
+
+    // Same domain → Internal
     if (isSameDomain(baseUrl, url)) return 'Internal';
+
+    // Homepage: external link pointing only at the root domain (no real path)
+    // e.g. https://openai.com/ = Homepage, https://openai.com/research/paper = External
+    if (pathname === '/' || pathname === '') return 'Homepage';
+
     return 'External';
 }
 
@@ -222,7 +255,7 @@ app.post('/api/preview', async (req, res) => {
         // Sort: internal first, then by category
         result.sort((a, b) => {
             if (a.category === b.category) return a.title.localeCompare(b.title);
-            const order = ['Internal', 'YouTube', 'Google Drive/Docs', 'GitHub', 'PDF', 'External'];
+            const order = ['Internal', 'YouTube', 'Google Drive/Docs', 'GitHub', 'PDF', 'External', 'Homepage', 'Social'];
             return order.indexOf(a.category) - order.indexOf(b.category);
         });
         res.json({ rootUrl: url, pageTitle: title, totalLinks: result.length, pagesVisited: 1, links: result });
