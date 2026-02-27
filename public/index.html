@@ -88,12 +88,13 @@
             </div>
           </div>
           <div class="option-group">
-            <label class="option-label">范围限制</label>
+            <label class="option-label">深度爬取范围</label>
             <label class="toggle-wrap">
               <input type="checkbox" id="sameDomainToggle" checked />
               <span class="toggle"></span>
-              <span class="toggle-text">仅同域名链接</span>
+              <span class="toggle-text">递进时只跟踪同域名链接</span>
             </label>
+            <div class="toggle-hint" id="toggleHint">仅对深度 2 / 3 生效</div>
           </div>
           <div class="option-group">
             <label class="option-label">爬取内容类型 <span
@@ -106,8 +107,8 @@
               <button class="chip" data-cat="Google Drive/Docs">Google文档</button>
               <button class="chip" data-cat="GitHub">GitHub</button>
               <button class="chip" data-cat="PDF">PDF</button>
-              <button class="chip" data-cat="Social">👤 社交主页</button>
-              <button class="chip" data-cat="Homepage">🏠 品牌首页</button>
+              <button class="chip" data-cat="Social">社交主页</button>
+              <button class="chip" data-cat="Homepage">品牌首页</button>
             </div>
           </div>
         </div>

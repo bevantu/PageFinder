@@ -431,6 +431,27 @@ body {
   font-weight: 500;
 }
 
+.toggle-hint {
+  font-size: 0.72rem;
+  color: var(--text3);
+  margin-top: 5px;
+  padding-left: 2px;
+  transition: color var(--transition);
+}
+
+.toggle-wrap.disabled-toggle {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.toggle-wrap.disabled-toggle+.toggle-hint {
+  color: var(--text3);
+}
+
+.toggle-hint.active-hint {
+  color: var(--accent2);
+}
+
 .filter-chips {
   display: flex;
   gap: 6px;

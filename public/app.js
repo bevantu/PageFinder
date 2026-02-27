@@ -83,8 +83,30 @@ document.querySelectorAll('.depth-btn').forEach(btn => {
         document.querySelectorAll('.depth-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         currentDepth = parseInt(btn.dataset.depth);
+        updateToggleState();
     });
 });
+
+function updateToggleState() {
+    const toggleWrap = $('sameDomainToggle').closest('label') || document.querySelector('.toggle-wrap');
+    const hint = $('toggleHint');
+    if (currentDepth <= 1) {
+        // Toggle has no effect at depth 1 — disable it visually
+        document.querySelector('.toggle-wrap').classList.add('disabled-toggle');
+        if (hint) {
+            hint.textContent = '深度为 1 时无效（无需跟踪子页面）';
+            hint.classList.remove('active-hint');
+        }
+    } else {
+        document.querySelector('.toggle-wrap').classList.remove('disabled-toggle');
+        if (hint) {
+            hint.textContent = sameDomainOnly
+                ? `深度 ${currentDepth} 爬取时，只跟踪同域名子页面`
+                : `深度 ${currentDepth} 爬取时，会跨域追踪外部链接（较慢）`;
+            hint.classList.add('active-hint');
+        }
+    }
+}
 
 // ── URL input ────────────────────────────────────
 urlInput.addEventListener('input', () => {
@@ -101,6 +123,7 @@ clearBtn.addEventListener('click', () => {
 });
 $('sameDomainToggle').addEventListener('change', e => {
     sameDomainOnly = e.target.checked;
+    updateToggleState();
 });
 
 // ── Filter chips — 爬取前多选预设 ────────────────
@@ -410,6 +433,7 @@ function showToast(msg, type = '') {
 // ── Init: paste URL from clipboard if available ───
 window.addEventListener('DOMContentLoaded', () => {
     urlInput.focus();
+    updateToggleState(); // set initial hint based on depth=1 default
     // Check if there's a URL-like thing in clipboard (user might have just copied one)
     if (navigator.clipboard && navigator.clipboard.readText) {
         navigator.clipboard.readText().then(text => {
