@@ -95,6 +95,24 @@ $('sameDomainToggle').addEventListener('change', e => {
     sameDomainOnly = e.target.checked;
 });
 
+// ── Filter chips (search card) ───────────────────
+document.querySelectorAll('#filterChips .chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+        if (!allLinks.length) {
+            showToast('请先爬取一个网页', 'error');
+            return;
+        }
+        const cat = chip.dataset.cat;
+        // Sync active state on chips
+        document.querySelectorAll('#filterChips .chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        // Sync with results tab bar
+        setCatTab(cat);
+        // Scroll to results
+        resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+});
+
 // ── Crawl triggers ───────────────────────────────
 crawlBtn.addEventListener('click', () => doCrawl(false));
 previewBtn.addEventListener('click', () => doCrawl(true));
@@ -171,6 +189,9 @@ async function doCrawl(preview = false) {
         searchQuery = '';
         searchInput.value = '';
 
+        // Sync filter chips with actual found categories
+        syncFilterChips(allLinks);
+
         applyFilters();
         showResults(data);
     } catch (err) {
@@ -217,10 +238,35 @@ function renderCatTabs(cats, links) {
 
 function setCatTab(cat) {
     activeCategory = cat;
+    // Sync results tab bar
     document.querySelectorAll('.cat-tab').forEach(t => {
         t.classList.toggle('active', t.dataset.cat === cat);
     });
+    // Sync search-card filter chips
+    document.querySelectorAll('#filterChips .chip').forEach(c => {
+        c.classList.toggle('active', c.dataset.cat === cat);
+    });
     applyFilters();
+}
+
+// ── Sync filter chips after crawl ─────────────────
+function syncFilterChips(links) {
+    const foundCats = new Set(links.map(l => l.category));
+    document.querySelectorAll('#filterChips .chip').forEach(chip => {
+        const cat = chip.dataset.cat;
+        if (cat === 'all') {
+            chip.classList.remove('disabled');
+            chip.classList.add('active');
+            chip.title = '';
+        } else if (foundCats.has(cat)) {
+            chip.classList.remove('disabled', 'active');
+            chip.title = '';
+        } else {
+            chip.classList.remove('active');
+            chip.classList.add('disabled');
+            chip.title = '当前结果中没有此类链接';
+        }
+    });
 }
 
 // ── Render: Link items ────────────────────────────
