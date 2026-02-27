@@ -143,7 +143,7 @@ searchInput.addEventListener('input', e => {
 // ── Copy all / Export ────────────────────────────
 copyAllBtn.addEventListener('click', () => {
     if (!filteredLinks.length) return;
-    const text = filteredLinks.map(l => `${l.title}\n${l.url}`).join('\n\n');
+    const text = filteredLinks.map(l => l.url).join('\n');
     copyText(text);
     showToast(`✅ 已复制 ${filteredLinks.length} 条链接`, 'success');
 });
