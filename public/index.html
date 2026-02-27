@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PageFinder — 智能网页链接提取器</title>
+  <meta name="description" content="自动提取网页中的所有链接，支持分页、子链接深度爬取，一键导入 NotebookLM" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Background orbs -->
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="16" cy="16" r="15" stroke="url(#lg1)" stroke-width="2"/>
+            <circle cx="16" cy="16" r="6" fill="url(#lg2)"/>
+            <line x1="16" y1="1" x2="16" y2="10" stroke="url(#lg1)" stroke-width="2" stroke-linecap="round"/>
+            <line x1="16" y1="22" x2="16" y2="31" stroke="url(#lg1)" stroke-width="2" stroke-linecap="round"/>
+            <line x1="1" y1="16" x2="10" y2="16" stroke="url(#lg1)" stroke-width="2" stroke-linecap="round"/>
+            <line x1="22" y1="16" x2="31" y2="16" stroke="url(#lg1)" stroke-width="2" stroke-linecap="round"/>
+            <defs>
+              <linearGradient id="lg1" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#818cf8"/>
+                <stop offset="1" stop-color="#34d399"/>
+              </linearGradient>
+              <linearGradient id="lg2" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#818cf8"/>
+                <stop offset="1" stop-color="#34d399"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <span class="logo-title">PageFinder</span>
+          <span class="logo-sub">智能网页链接提取器</span>
+        </div>
+      </div>
+      <div class="header-badge">
+        <span class="badge-dot"></span>
+        专为 NotebookLM 设计
+      </div>
+    </header>
+
+    <!-- Main input section -->
+    <section class="search-section">
+      <div class="search-card">
+        <div class="search-label">输入网页地址</div>
+        <div class="search-row">
+          <div class="url-input-wrap">
+            <svg class="input-icon" viewBox="0 0 20 20" fill="none"><path d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" fill="currentColor"/></svg>
+            <input
+              type="url"
+              id="urlInput"
+              placeholder="https://example.com/course"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <button class="clear-btn" id="clearBtn" title="清除" style="display:none">
+              <svg viewBox="0 0 20 20" fill="none"><path d="M6 6l8 8M14 6l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Options -->
+        <div class="options-row">
+          <div class="option-group">
+            <label class="option-label">爬取深度</label>
+            <div class="depth-selector">
+              <button class="depth-btn active" data-depth="1" id="depth1">仅首页</button>
+              <button class="depth-btn" data-depth="2" id="depth2">深度 2</button>
+              <button class="depth-btn" data-depth="3" id="depth3">深度 3</button>
+            </div>
+          </div>
+          <div class="option-group">
+            <label class="option-label">范围限制</label>
+            <label class="toggle-wrap">
+              <input type="checkbox" id="sameDomainToggle" checked />
+              <span class="toggle"></span>
+              <span class="toggle-text">仅同域名链接</span>
+            </label>
+          </div>
+          <div class="option-group">
+            <label class="option-label">过滤类型</label>
+            <div class="filter-chips" id="filterChips">
+              <button class="chip active" data-cat="all">全部</button>
+              <button class="chip" data-cat="Internal">站内</button>
+              <button class="chip" data-cat="External">外部</button>
+              <button class="chip" data-cat="YouTube">YouTube</button>
+              <button class="chip" data-cat="Google Drive/Docs">Google文档</button>
+              <button class="chip" data-cat="GitHub">GitHub</button>
+              <button class="chip" data-cat="PDF">PDF</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTA buttons -->
+        <div class="cta-row">
+          <button class="btn-primary" id="crawlBtn">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4zm0 3a1 1 0 00-1 1v2H7a1 1 0 000 2h2v2a1 1 0 002 0v-2h2a1 1 0 000-2h-2V8a1 1 0 00-1-1z" fill="currentColor"/></svg>
+            深度爬取
+          </button>
+          <button class="btn-secondary" id="previewBtn">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" fill="currentColor"/><path d="M2 10C3.6 6.1 6.5 4 10 4s6.4 2.1 8 6c-1.6 3.9-4.5 6-8 6s-6.4-2.1-8-6z" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+            快速预览
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Loading state -->
+    <div class="loading-section" id="loadingSection" style="display:none">
+      <div class="loading-card">
+        <div class="spinner-wrap">
+          <div class="spinner"></div>
+          <div class="spinner-inner"></div>
+        </div>
+        <div class="loading-text">
+          <div class="loading-title" id="loadingTitle">正在分析网页…</div>
+          <div class="loading-sub" id="loadingSub">请稍候，正在提取所有链接</div>
+        </div>
+        <div class="loading-bar-wrap">
+          <div class="loading-bar" id="loadingBar"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error state -->
+    <div class="error-section" id="errorSection" style="display:none">
+      <div class="error-card">
+        <div class="error-icon">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#f87171" stroke-width="2"/><path d="M12 7v5M12 16v1" stroke="#f87171" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="error-title">爬取失败</div>
+        <div class="error-msg" id="errorMsg">无法连接到目标网页</div>
+        <button class="btn-secondary btn-sm" id="retryBtn">重试</button>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <section class="results-section" id="resultsSection" style="display:none">
+      <!-- Stats bar -->
+      <div class="stats-bar">
+        <div class="stats-info">
+          <div class="stat-item">
+            <span class="stat-num" id="statTotal">0</span>
+            <span class="stat-label">条链接</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-num" id="statPages">0</span>
+            <span class="stat-label">个页面</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item stat-title-info">
+            <span class="stat-label page-title-label" id="pageTitle">—</span>
+          </div>
+        </div>
+        <div class="stats-actions">
+          <div class="search-input-wrap">
+            <svg class="si-icon" viewBox="0 0 20 20" fill="none"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" fill="currentColor" clip-rule="evenodd"/></svg>
+            <input type="text" id="searchInput" placeholder="搜索链接标题或URL…" />
+          </div>
+          <button class="btn-copy-all" id="copyAllBtn">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" fill="currentColor"/><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" fill="currentColor"/></svg>
+            复制全部
+          </button>
+          <button class="btn-export" id="exportBtn">
+            <svg viewBox="0 0 20 20" fill="none"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" fill="currentColor" clip-rule="evenodd"/></svg>
+            导出
+          </button>
+        </div>
+      </div>
+
+      <!-- Category tabs -->
+      <div class="cat-tabs" id="catTabs"></div>
+
+      <!-- Link list -->
+      <div class="link-list" id="linkList"></div>
+
+      <!-- Empty filter state -->
+      <div class="empty-filter" id="emptyFilter" style="display:none">
+        <svg viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="28" stroke="#4f46e5" stroke-width="2" opacity="0.3"/><path d="M22 32h20M32 22v20" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" opacity="0.5"/></svg>
+        <p>没有找到匹配的链接</p>
+      </div>
+    </section>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
